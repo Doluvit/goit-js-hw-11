@@ -1,7 +1,6 @@
 import './css/styles.css';
 import ImagesApi from './js/imagesApi';
 import createImageCard from './js/createImageCard';
-import buttonLoadMore from './js/buttonLoadMore';
 import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
@@ -16,48 +15,69 @@ const refs = {
 const imagesApi = new ImagesApi();
 const gallery = new SimpleLightbox('.gallery a');
 
-const optionsForObserver = {
-  rootMargin: '300px',
-};
-const observer = new IntersectionObserver(onEntry, optionsForObserver);
+// const optionsForObserver = {
+//   rootMargin: '300px',
+// };
+// const observer = new IntersectionObserver(onEntry, optionsForObserver);
 
 refs.form.addEventListener('submit', onFormSubmit);
 refs.loadMoreBtn.addEventListener('click', buttonLoadMore);
 
+let currentPage = 1;
+
+function buttonLoadMore() {
+  currentPage += 1;
+  imagesApi
+  .getImage(currentPage)
+  .then(({ hits, totalHits }) => {
+    imagesApi.incrHits(hits);
+    if (totalHits <= imagesApi.hits) {
+      refs.loadMoreBtn.hidden = true;
+      endAlert();
+    }
+    
+    createImageCard(hits);
+    gallery.refresh();
+  })
+  .catch(error => {
+    console.warn(`${error}`);
+  });
+}
+
 function onFormSubmit(event) {
   event.preventDefault();
-
+  
   imagesApi.query = event.currentTarget.elements.searchQuery.value.trim();
-
+  
+  
   imagesApi.resetHits();
   imagesApi.resetPage();
-
+  
   clearGallery();
-
+  
   if (!imagesApi.query) {
     return errorWarning();
   }
-
+  
   imagesApi.getImage().then(({ hits, totalHits }) => {
     if (!hits.length) {
       return errorWarning();
     }
-
-    observer.observe(refs.wrapper);
-
+    
+    // observer.observe(refs.wrapper);
+    
     imagesApi.incrHits(hits);
     createImageCard(hits);
     successAlert(totalHits);
     gallery.refresh();
-
+     refs.loadMoreBtn.hidden = false;
     if (hits.length === totalHits) {
-      // buttonLoadMore.hidden = true;
-      observer.unobserve(refs.wrapper);
+     // observer.unobserve(refs.wrapper);
       endAlert();
     }
   });
-
-  observer.unobserve(refs.wrapper);
+  
+  // observer.unobserve(refs.wrapper);
 }
 
 function onEntry(entries) {
@@ -68,7 +88,7 @@ function onEntry(entries) {
         .then(({ hits, totalHits }) => {
           imagesApi.incrHits(hits);
           if (totalHits <= imagesApi.hits) {
-            observer.unobserve(refs.wrapper);
+            // observer.unobserve(refs.wrapper);
             endAlert();
           }
 
@@ -94,6 +114,7 @@ function successAlert(totalHits) {
 }
 
 function errorWarning() {
+  refs.loadMoreBtn.hidden = true;
   Notiflix.Notify.failure(
     'Sorry, there are no images matching your search query. Please try again.'
   );
@@ -105,12 +126,12 @@ function endAlert() {
   );
 }
 
-function scrollGallery() {
-  const { height } =
-    refs.galleryWrapper.firstElementChild.getBoundingClientRect();
+// function scrollGallery() {
+//   const { height } =
+//     refs.galleryWrapper.firstElementChild.getBoundingClientRect();
 
-  window.scrollBy({
-    top: height * 2,
-    behavior: 'smooth',
-  });
-}
+//   window.scrollBy({
+//     top: height * 2,
+//     behavior: 'smooth',
+//   });
+// }
