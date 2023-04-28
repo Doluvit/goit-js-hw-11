@@ -20,14 +20,13 @@ export default class ImagesApi {
     });
 
     const address = `${BASE_URL}?${options}`;
-  
+
     try {
-      const response = await axios.get(address)
+      const response = await axios.get(address);
       this.incrPage();
 
       return response.data;
-    }
-    catch (error) {
+    } catch (error) {
       console.log(`${error}`);
     }
   }
@@ -50,6 +49,3 @@ export default class ImagesApi {
     this.page = 1;
   }
 }
-
-
-

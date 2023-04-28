@@ -31,26 +31,25 @@ refs.form.addEventListener('submit', onFormSubmit);
 
 function onFormSubmit(event) {
   event.preventDefault();
-  
+
   imagesApi.query = event.currentTarget.elements.searchQuery.value.trim();
-  
-  
+
   imagesApi.resetHits();
   imagesApi.resetPage();
-  
+
   clearGallery();
-  
+
   if (!imagesApi.query) {
     return errorWarning();
   }
-  
+
   imagesApi.getImage().then(({ hits, totalHits }) => {
     if (!hits.length) {
       return errorWarning();
     }
-    
+
     observer.observe(refs.wrapper);
-    
+
     imagesApi.incrHits(hits);
     createImageCard(hits);
     successAlert(totalHits);
@@ -59,11 +58,11 @@ function onFormSubmit(event) {
     //  refs.loadMoreBtn.hidden = false;
 
     if (hits.length === totalHits) {
-     observer.unobserve(refs.wrapper);
+      observer.unobserve(refs.wrapper);
       endAlert();
     }
   });
-  
+
   observer.unobserve(refs.wrapper);
 }
 
@@ -101,7 +100,6 @@ function successAlert(totalHits) {
 }
 
 function errorWarning() {
-  
   // refs.loadMoreBtn.hidden = true;
 
   Notiflix.Notify.failure(
