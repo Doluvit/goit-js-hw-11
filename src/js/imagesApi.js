@@ -10,7 +10,7 @@ export default class ImagesApi {
   }
   async getImage() {
     const options = new URLSearchParams({
-      per_page: 200,
+      per_page: 40,
       page: this.page,
       key: '35750214-c04e148fdca89a66c6114339d',
       q: this.currentQuery,
